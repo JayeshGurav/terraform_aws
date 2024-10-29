@@ -44,3 +44,19 @@ resource "aws_launch_configuration" "ec21" {
         EOF
   
 }
+
+#Now we can create Autoscalling Group
+
+resource "aws_autoscaling_group" "ASG_Premium" {
+    launch_configuration = aws_launch_configuration.example.ec21
+
+    min_size = 2
+    max_size = 3
+
+    tag {
+      key = "ASG_Premium"
+      value = "terraform-asg-ASG_Premium"
+      propagate_at_launch = true
+    }
+  
+}
