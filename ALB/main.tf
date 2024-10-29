@@ -100,3 +100,37 @@ resource "aws_lb_target_group" "asg-target-group" {
     }
 }
 
+resource "aws_autoscaling_group" "ASG-ALB" {
+  launch_configuration = "aws.launch_configuration.asg-target-group.name"
+  vpc_zone_identifier = data.aws_subnets_ids.default.ids
+
+  target_group_arns = [aws_lb.LB-SG.arn]
+  health_check_type = "ELB"
+
+  min_size = 2
+  max_size = 10
+
+  tag {
+    key = "Name"
+    value = "terraform-lb-target-group"
+    propagate_at_launch = true
+  }
+  
+}
+
+resource "aws_lb_listener_rule" "asg" {
+  listener_arn = "aws_lb_listener.http.arn"
+  priority = 100
+
+  condition {
+    # field = "path-patten"
+    # values = ["*"]
+  }
+  action {
+    type = "forward"
+    target_group_arn = "aws_lb_target_group.asg-target-group.asg.arn"
+  }
+  
+}
+
+
